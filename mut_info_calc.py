@@ -11,12 +11,14 @@ from scipy.optimize import minimize
 from scipy.optimize import differential_evolution
 
 def write_to_csv(ddata, name):
-    f = open(f'./{name}', 'w')
+    print(name)
+    f = open('./'+name, 'w')
     writer = csv.writer(f,delimiter = " ")
     for t, d in zip(ddata[0], ddata[1]):
         if d != 0:
             writer.writerow([t, d])
     f.close()
+
 def gaussian_pdf(x, s):
     return 1/(math.sqrt(2*math.pi*s**2)) * math.e**(-x**2/(2*s**2))
 
@@ -61,13 +63,14 @@ def mut_info(n, tf, s):
     return mut_info
 
 def iXYvsHx():
+    graphtitle = "MutualInfoVsBinCount" 
     tf = 1000
-    sig_ab_1 = 50 # 0.05 sigab/tf
-    sig_ab_2 = 25 # 0.025 sigab/tf
-    sig_ab_3 = 12.5 # 0.0125 sigab/tf
-    sig_ab_4 = 100 # 0.1 sigab/tf
+    sig_ab_1 = 500 # 0.5 sigab/tf
+    sig_ab_2 = 250 # 0.25 sigab/tf
+    sig_ab_3 = 125 # 0.125 sigab/tf
+    sig_ab_4 = 62.5 # 0.0625 sigab/tf
 
-    bin_counts = [i for i in range(1,16)]
+    bin_counts = [i for i in range(1,12)]
     data = [[],[],[],[]]
 
     for i in bin_counts:
@@ -80,14 +83,21 @@ def iXYvsHx():
         data[1].append(mut_info(n, tf, sig_ab_2))
         data[2].append(mut_info(n, tf, sig_ab_3))
         data[3].append(mut_info(n, tf, sig_ab_4))
-    plt.plot(bin_counts, data[0], label = "$\sigma_{ab}/T_f = 0.05$")
-    plt.plot(bin_counts, data[1], label = "$\sigma_{ab}/T_f = 0.025$")
-    plt.plot(bin_counts, data[2], label = "$\sigma_{ab}/T_f = 0.0125$")
-    plt.plot(bin_counts, data[3], label = "$\sigma_{ab}/T_f = 0.1$")
+    plt.plot(bin_counts, data[0], label = "$\sigma_{ab}/T_f ="+str(sig_ab_1))
+    plt.plot(bin_counts, data[1], label = "$\sigma_{ab}/T_f ="+str(sig_ab_2))
+    plt.plot(bin_counts, data[2], label = "$\sigma_{ab}/T_f ="+str(sig_ab_3))
+    plt.plot(bin_counts, data[3], label = "$\sigma_{ab}/T_f ="+str(sig_ab_4))
     plt.xlabel("H(X)")
     plt.ylabel("I(X;Y)")
+    
+    write_to_csv([bin_counts, data[0]], "./datafiles/"+graphtitle+"_s"+str(sig_ab_1)+".csv")
+    write_to_csv([bin_counts, data[1]], "./datafiles/"+graphtitle+"_s"+str(sig_ab_2)+".csv")
+    write_to_csv([bin_counts, data[2]], "./datafiles/"+graphtitle+"_s"+str(sig_ab_3)+".csv")
+    write_to_csv([bin_counts, data[3]], "./datafiles/"+graphtitle+"_s"+str(sig_ab_4)+".csv")
+
     plt.legend()
-    plt.show()
+    
+    plt.savefig("./plots/"+graphtitle)
 
 
 if __name__ == "__main__":
